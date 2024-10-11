@@ -1,0 +1,59 @@
+Declarative way
+
+pipeline{
+agent any
+
+tools{
+maven 'maven3.9.9'
+}
+triggers {
+  pollSCM '* * * * *'
+}
+
+
+stages{
+   //Get the code from GitHub
+   stage('CheckoutCode'){
+   steps{
+   git credentialsId: '840b77f7-3ef9-4f1c-becf-f71db09df745', url: 'https://github.com/mss-ec-apps-augbatch/maven-web-application.git'
+}
+}
+  //Do the build
+  stage('Build'){
+  steps{
+  sh "mvn clean package"
+}
+}
+
+  //Execute SonarQube Report
+  stage('SonarQubeReport'){
+  steps{
+  sh "mvn clean sonar:sonar"
+} 
+}
+  //Upload Artifacte Into Nexus Server
+stage('UploadArtifactIntoNexusServer'){
+  steps{
+  sh "mvn clean deploy"
+} 
+}
+  //Deploy App ino Tomcat Server
+  stage('DeployAppIntoTomcatServer'){
+  steps{sshagent(['bd00ef4d-5c57-4a6c-876a-f530e70ff45e']) {
+    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ubuntu@ 13.201.73.98:/opt/apache-tomcat-9.0.95/webapps"
+  
+}
+}}
+}//Stages Closing
+post {
+  always {
+    // One or more steps need to be included within each condition's block.
+  }
+  success {
+    // One or more steps need to be included within each condition's block.
+  }
+  failure {
+    // One or more steps need to be included within each condition's block.
+  }
+}
+}//Pipeline Closing  
