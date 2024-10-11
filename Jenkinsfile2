@@ -45,6 +45,7 @@ stage('UploadArtifactIntoNexusServer'){
 }
 }}
 }//Stages Closing
+/*
 post {
   always {
     // One or more steps need to be included within each condition's block.
@@ -56,4 +57,5 @@ post {
     // One or more steps need to be included within each condition's block.
   }
 }
+*/
 }//Pipeline Closing  
